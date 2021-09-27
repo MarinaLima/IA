@@ -43,9 +43,10 @@ class Environment:
         self.mu_price = 1.2
         self.sigma_price = 0.2
         self.on_sale = False
+        self.max_n = 1500
 
     def initial_percepts(self):
-        return {'n': self.n, 'price': self.price}
+        return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
 
     def signal(self, action):
 
@@ -67,21 +68,73 @@ class Environment:
         self.price = np.random.normal(self.mu_price, self.sigma_price)
 
         self.clock += 1
-        return {'n': self.n, 'price': self.price}
+        return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
+
+
+class Agent:
+
+    def __init__(self, environment):
+        self.environment = environment
+        self.percepts = environment.initial_percepts()
+        self.spendings = []
+        self.clock = 1
+        self.S = {
+            'average_price': self.percepts['price'],
+            'cheap': self.percepts['price'],
+            'low': 0,
+            'min': self.percepts['max_n']
+        }
+
+    def act(self):
+        """
+        Verifies env's state
+        baseado nas percepções ele executa uma ação, adicionando rolos no estoque e o valor que gastou
+        """
+        # Define to_buy
+        to_buy = 0
+        if self.percepts['n'] <= self.S['low']:
+            to_buy = self.S['min'] - self.percepts['n']
+        elif self.percepts['price'] <= self.S['low']:
+            to_buy = self.percepts['max_n'] - self.percepts['n']
+
+        action = {'to_buy': to_buy}
+
+        # Act
+        self.spendings.append(to_buy * self.percepts['price'])
+        percepts = self.environment.signal(action)
+
+        mean_value = (self.S['average_price'] * self.clock + self.percepts['price']) / (self.clock + 1)
+        # Update belief state
+        self.S = {
+            'average_price': mean_value,
+            # TODO mudar o multiplicador, se não tiver preço baixo por muito tempo aumenta ele
+            # ou o barato pode ser menor que a última compra
+            # 'cheap': mean_value * 0.8,
+            'cheap': self.percepts['price'],
+            'low': 100,
+            'min': self.percepts['max_n']
+        }
+        self.clock += 1
 
 
 if __name__ == '__main__':
     env = Environment(0, 1.2)
+    ag = Agent(env)
 
     prices = []
+    n = []
 
     for i in range(1000):
-        percepts = env.signal({'to_buy': 0})
-        prices.append((percepts['price']))
+        ag.act()
+        prices.append(env.price)
+        n.append((env.n))
 
         plt.plot(prices)
         plt.show()
 
-        plt.hist(prices)
-        plt.show
+        plt.plot(n)
+        plt.show()
+
+        plt.plot(prices)
+        plt.show()
 
