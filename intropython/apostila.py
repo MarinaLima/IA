@@ -73,7 +73,6 @@ def generate_list():
     print(list(range(3, 50, 3)))
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     read_phrase()
     calc_z()
