@@ -22,6 +22,8 @@
         - Lembrar
             - Atualizar a noção de preço bom
             - Atualizar a noção de estoque baixo
+
+    - analisar como o agente sairia com a mudança do modelo de preço e estoque
 """
 
 
@@ -54,6 +56,7 @@ class Agent:
 
     def run(self, n):
         # Execute action n times
+        # Guardando preço ao longo do tempo, número de rolos ao longo do tempo, gasto e plota depois
         pass
 
 
