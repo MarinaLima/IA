@@ -27,6 +27,7 @@
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Environment:
@@ -55,12 +56,13 @@ class Environment:
 
         # no começo de cada semana verifica se tem promoção ou não
         if self.clock % 7 == 0:
+            self.price = 1.2
             self.on_sale = True if np.random.rand() < 0.5 else False
 
         if self.on_sale:
             self.mu_price -= self.sigma_price
         else:
-            self.sigma_price = np.random.normal(self.mu_price, self.sigma_price)
+            self.sigma_price = max(np.random.normal(self.mu_price, self.sigma_price), 0.9)
 
         self.price = np.random.normal(self.mu_price, self.sigma_price)
 
@@ -68,26 +70,18 @@ class Environment:
         return {'n': self.n, 'price': self.price}
 
 
-class Agent:
-
-    def __init__(self, environment):
-        self.environment = environment
-        self.percepts = environment.initial_percepts()
-        self.S = {'cheap': self.percepts['price'], 'low': 0}
-
-    def act(self):
-        """
-        Verifies env's state
-        baseado nas percepções ele executa uma ação, adicionando rolos no estoque e o valor que gastou
-        """
-        action = {'buy_n': n}
-        percepts = self.environment.signal(action)
-
-    def run(self, n):
-        # Execute action n times
-        # Guardando preço ao longo do tempo, número de rolos ao longo do tempo, gasto e plotar depois
-        pass
-
-
 if __name__ == '__main__':
-    pass
+    env = Environment(0, 1.2)
+
+    prices = []
+
+    for i in range(1000):
+        percepts = env.signal({'to_buy': 0})
+        prices.append((percepts['price']))
+
+        plt.plot(prices)
+        plt.show()
+
+        plt.hist(prices)
+        plt.show
+
