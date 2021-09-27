@@ -2,7 +2,7 @@
     Controle de Papel Higiênico:
     + Ambiente
         - Número de rolos existentes (estoque)
-        - Modelo de gasto: média e desvio padrão por dia (amostragem aleatória com distribuição normal/gaussiana -
+        - Modelo de gasto: média e desvio padrão por dia da semana (amostragem aleatória com distribuição normal/gaussiana -
         números perto da média tem mais chances de serem gerados)
         - Modelo de preço
             - Custo Médio: $1,20 por rolo
@@ -26,17 +26,46 @@
     - analisar como o agente sairia com a mudança do modelo de preço e estoque
 """
 
+import numpy as np
+
 
 class Environment:
 
-    def __init__(self):
-        pass
+    def __init__(self, n, price):
+        self.n = n
+        self.price = price
+        self.clock = 0
+        # uso de rolos de papel higiênico por dia de semana
+        self.mu_usage = [10, 100, 150, 300, 125, 50, 15]
+        # desvio padrão de uso
+        self.sigma_usage = [2, 10, 10, 20, 10, 10, 2]
+        self.mu_price = 1.2
+        self.sigma_price = 0.2
+        self.on_sale = False
 
     def initial_percepts(self):
-        return {'n': x, 'price': p}
+        return {'n': self.n, 'price': self.price}
 
     def signal(self, action):
-        return {'n': x, 'price': p}
+
+        usage = np.random.normal(self.mu_usage[self.clock % len(self.mu_usage)],
+                                 self.sigma_usage[self.clock % len(self.sigma_usage)])
+        bought = action['to_buy']
+        self.n = self.n - usage + bought
+
+        # no começo de cada semana verifica se tem promoção ou não
+        if self.clock % 7 == 0:
+            self.on_sale = True if np.random.rand() < 0.5 else False
+
+        if self.on_sale:
+            self.mu_price -= self.sigma_price
+        else:
+            self.sigma_price = np.random.normal(self.mu_price, self.sigma_price)
+
+        self.price = np.random.normal(self.mu_price, self.sigma_price)
+
+        self.clock += 1
+        return {'n': self.n, 'price': self.price}
 
 
 class Agent:
@@ -56,9 +85,9 @@ class Agent:
 
     def run(self, n):
         # Execute action n times
-        # Guardando preço ao longo do tempo, número de rolos ao longo do tempo, gasto e plota depois
+        # Guardando preço ao longo do tempo, número de rolos ao longo do tempo, gasto e plotar depois
         pass
 
 
 if __name__ == '__main__':
-    Agent.run(5)
+    pass
