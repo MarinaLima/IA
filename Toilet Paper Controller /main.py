@@ -25,9 +25,37 @@
 """
 
 
-def print_hi(name):
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+class Environment:
+
+    def __init__(self):
+        pass
+
+    def initial_percepts(self):
+        return {'n': x, 'price': p}
+
+    def signal(self, action):
+        return {'n': x, 'price': p}
+
+
+class Agent:
+
+    def __init__(self, environment):
+        self.environment = environment
+        self.percepts = environment.initial_percepts()
+        self.S = {'cheap': self.percepts['price'], 'low': 0}
+
+    def act(self):
+        """
+        Verifies env's state
+        baseado nas percepções ele executa uma ação, adicionando rolos no estoque e o valor que gastou
+        """
+        action = {'buy_n': n}
+        percepts = self.environment.signal(action)
+
+    def run(self, n):
+        # Execute action n times
+        pass
 
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    Agent.run(5)
