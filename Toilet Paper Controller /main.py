@@ -60,12 +60,10 @@ class Environment:
             self.price = 1.2
             self.on_sale = True if np.random.rand() < 0.5 else False
 
-        if self.on_sale:
-            self.mu_price -= self.sigma_price
-        else:
-            self.sigma_price = max(np.random.normal(self.mu_price, self.sigma_price), 0.9)
-
-        self.price = np.random.normal(self.mu_price, self.sigma_price)
+            if self.on_sale:
+                self.mu_price -= self.sigma_price
+            else:
+                self.sigma_price = max(np.random.normal(self.mu_price, self.sigma_price), 0.9)
 
         self.clock += 1
         return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
@@ -96,15 +94,17 @@ class Agent:
             to_buy = self.S['min'] - self.percepts['n']
         elif self.percepts['price'] <= self.S['low']:
             to_buy = self.percepts['max_n'] - self.percepts['n']
+        else:
+            to_buy = 0
 
         action = {'to_buy': to_buy}
 
         # Act
         self.spendings.append(to_buy * self.percepts['price'])
-        percepts = self.environment.signal(action)
+        self.percepts = self.environment.signal(action)
 
-        mean_value = (self.S['average_price'] * self.clock + self.percepts['price']) / (self.clock + 1)
         # Update belief state
+        mean_value = (self.S['average_price'] * self.clock + self.percepts['price']) / (self.clock + 1)
         self.S = {
             'average_price': mean_value,
             # TODO mudar o multiplicador, se não tiver preço baixo por muito tempo aumenta ele
@@ -124,17 +124,17 @@ if __name__ == '__main__':
     prices = []
     n = []
 
-    for i in range(1000):
+    for i in range(1):
         ag.act()
         prices.append(env.price)
         n.append((env.n))
 
-        plt.plot(prices)
-        plt.show()
+    plt.plot(prices)
+    plt.show()
 
-        plt.plot(n)
-        plt.show()
+    plt.plot(n)
+    plt.show()
 
-        plt.plot(prices)
-        plt.show()
+    plt.plot(ag.spendings)
+    plt.show()
 
