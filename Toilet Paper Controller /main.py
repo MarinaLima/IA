@@ -49,9 +49,9 @@ class Environment:
         return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
 
     def signal(self, action):
-
-        usage = np.random.normal(self.mu_usage[self.clock % len(self.mu_usage)],
-                                 self.sigma_usage[self.clock % len(self.sigma_usage)])
+        # TODO usage must be integer
+        usage = int(np.random.normal(self.mu_usage[self.clock % len(self.mu_usage)],
+                                     self.sigma_usage[self.clock % len(self.sigma_usage)]))
         bought = action['to_buy']
         self.n = self.n - usage + bought
 
@@ -122,14 +122,16 @@ if __name__ == '__main__':
 
     prices = []
     n = []
+    days = 1000
 
-    for i in range(1000):
+    for i in range(days):
         ag.act()
         prices.append(env.price)
-        n.append((env.n))
+        n.append(env.n)
 
     plt.plot(prices)
     plt.show()
+
 """
     plt.plot(n)
     plt.show()
