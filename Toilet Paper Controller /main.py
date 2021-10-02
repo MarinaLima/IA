@@ -2,7 +2,8 @@
     Controle de Papel Higiênico:
     + Ambiente
         - Número de rolos existentes (estoque)
-        - Modelo de gasto: média e desvio padrão por dia da semana (amostragem aleatória com distribuição normal/gaussiana -
+        - Modelo de gasto: média e desvio padrão por dia da semana (amostragem aleatória com distribuição
+        normal/gaussiana)
         números perto da média tem mais chances de serem gerados)
         - Modelo de preço
             - Custo Médio: $1,20 por rolo
@@ -121,13 +122,13 @@ if __name__ == '__main__':
     ag = Agent(env)
 
     prices = []
-    n = []
+    inventory = []
     days = 1000
 
     for i in range(days):
         ag.act()
         prices.append(env.price)
-        n.append(env.n)
+        inventory.append(env.n)
 
     plt.plot(prices)
     plt.show()
@@ -139,4 +140,3 @@ if __name__ == '__main__':
     plt.plot(ag.spendings)
     plt.show()
 """
-
