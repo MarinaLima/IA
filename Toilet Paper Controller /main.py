@@ -37,6 +37,7 @@ class Environment:
         self.n = n
         self.price = price
         self.clock = 0
+        self.day = 0
         # uso de rolos de papel higiênico por dia de semana
         self.mu_usage = [10, 100, 150, 300, 125, 50, 15]
         # desvio padrão de uso
@@ -44,7 +45,7 @@ class Environment:
         self.mu_price = 1.2
         self.sigma_price = 0.2
         self.on_sale = False
-        self.max_n = 1500
+        self.max_n = 1000
 
     def initial_percepts(self):
         return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
@@ -54,9 +55,11 @@ class Environment:
                                      self.sigma_usage[self.clock % len(self.sigma_usage)]))
         bought = action['to_buy']
         self.n = self.n - usage + bought
+        self.day += 1
 
         # no começo de cada semana verifica se tem promoção ou não
         if self.clock % 7 == 0:
+            self.day = 0
             self.price = 1.2
             self.on_sale = True if np.random.rand() < 0.5 else False
 
@@ -66,7 +69,7 @@ class Environment:
                 self.price = max(np.random.normal(self.mu_price, self.sigma_price), 0.9)
 
         self.clock += 1
-        return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
+        return {'n': self.n, 'price': self.price, 'max_n': self.max_n, "day": self.day}
 
 
 class Agent:
@@ -90,9 +93,11 @@ class Agent:
         """
         # Define to_buy
         to_buy = 0
+        # se a quantidade está baixa compra o mínimo
         if self.percepts['n'] <= self.S['low']:
             to_buy = self.S['min'] - self.percepts['n']
-        elif self.percepts['price'] <= self.S['low']:
+        # se tá barato enche o estoque
+        if self.percepts['price'] <= self.S['cheap']:
             to_buy = self.percepts['max_n'] - self.percepts['n']
 
         action = {'to_buy': to_buy}
@@ -106,12 +111,12 @@ class Agent:
 
         self.S = {
             'average_price': mean_value,
-            # TODO mudar o multiplicador, se não tiver preço baixo por muito tempo aumenta ele
+            # TODO mudar o multiplicador, fica verificando se preço baixo acontece, se não tiver preço baixo por muito tempo aumenta ele até chegar na média
             # ou o barato pode ser menor que a última compra
             # 'cheap': mean_value * 0.8,
             'cheap': self.percepts['price'],
-            'low': 100,
-            'min': self.percepts['max_n']
+            'low': self.environment.mu_usage[self.percepts['day']],
+            'min': self.environment.mu_usage[self.percepts['day']] * 1.5
         }
         self.clock += 1
 
