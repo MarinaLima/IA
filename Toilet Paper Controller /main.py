@@ -50,7 +50,6 @@ class Environment:
         return {'n': self.n, 'price': self.price, 'max_n': self.max_n}
 
     def signal(self, action):
-        # TODO usage must be integer
         usage = int(np.random.normal(self.mu_usage[self.clock % len(self.mu_usage)],
                                      self.sigma_usage[self.clock % len(self.sigma_usage)]))
         bought = action['to_buy']
@@ -130,8 +129,23 @@ if __name__ == '__main__':
         prices.append(env.price)
         inventory.append(env.n)
 
-    plt.plot(prices)
+    fig, ax1 = plt.subplots()
+    ax2 = ax1.twinx()
+    ax1.plot(prices, 'g-')
+    ax2.plot(inventory, 'b-')
+
+    ax1.set_xlabel('Tempo')
+    ax1.set_ylabel("Preço", color='g')
+    ax2.set_ylabel("Estoque", color='b')
+
     plt.show()
+
+"""
+    plt.plot(prices, label="Preço")
+    plt.plot(inventory, label="Estoque")
+    plt.plot(ag.spendings, label="Gasto")
+    plt.legend()
+ """
 
 """
     plt.plot(n)
