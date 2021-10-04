@@ -94,13 +94,13 @@ class Agent:
         """
         # Define to_buy
         to_buy = 0
-        # se a quantidade está baixa compra o mínimo
-        if self.percepts['n'] <= self.S['low']:
-            to_buy = self.S['min'] - self.percepts['n']
         # se tá barato enche o estoque
         if self.percepts['price'] <= self.S['cheap']:
             to_buy = self.percepts['max_n'] - self.percepts['n']
             self.S['time_without_cheap'] = 0
+        # se a quantidade está baixa compra o mínimo
+        elif self.percepts['n'] <= self.S['low']:
+            to_buy = self.S['min'] - self.percepts['n']
 
         action = {'to_buy': to_buy}
 
