@@ -109,14 +109,22 @@ class Agent:
         # Update belief state
         mean_value = (self.S['average_price'] * self.clock + self.percepts['price']) / (self.clock + 1)
 
+        # cheap = mean_value
+        # if self.clock == 1:
+        #     cheap = mean_value * 0.8
+
+        day = self.percepts['day']
+        next_day = day + 1 if day < 6 else -1
+        low = self.environment.mu_usage[day] + self.environment.mu_usage[next_day]
+
         self.S = {
             'average_price': mean_value,
             # TODO mudar o multiplicador, fica verificando se preço baixo acontece, se não tiver preço baixo por muito tempo aumenta ele até chegar na média
             # ou o barato pode ser menor que a última compra
-            # 'cheap': mean_value * 0.8,
-            'cheap': self.percepts['price'],
-            'low': self.environment.mu_usage[self.percepts['day']],
-            'min': self.environment.mu_usage[self.percepts['day']] * 1.5
+            'cheap': mean_value * 0.8,
+            # 'cheap': self.percepts['price'],
+            'low': low,
+            'min': low * 1.5
         }
         self.clock += 1
 
