@@ -129,14 +129,26 @@ if __name__ == '__main__':
         prices.append(env.price)
         inventory.append(env.n)
 
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
-    ax1.plot(prices, 'g-')
-    ax2.plot(inventory, 'b-')
+    # fig, ax1 = plt.subplots()
+    # ax2 = ax1.twinx()
+    # ax1.plot(prices, 'g-')
+    # ax2.plot(inventory, 'b-')
 
-    ax1.set_xlabel('Tempo')
-    ax1.set_ylabel("Preço", color='g')
-    ax2.set_ylabel("Estoque", color='b')
+    # ax1.set_xlabel('Tempo')
+    # ax1.set_ylabel("Preço", color='g')
+    # ax2.set_ylabel("Estoque", color='b')
+
+    plt.plot(prices)
+    plt.title("Preço")
+    plt.show()
+
+    plt.plot(inventory)
+    plt.title("Estoque")
+    plt.show()
+
+    plt.plot(ag.spendings)
+    plt.title("Gastos")
+    plt.show()
 
     plt.show()
 
@@ -147,10 +159,3 @@ if __name__ == '__main__':
     plt.legend()
  """
 
-"""
-    plt.plot(n)
-    plt.show()
-
-    plt.plot(ag.spendings)
-    plt.show()
-"""
