@@ -83,7 +83,8 @@ class Agent:
             'average_price': self.percepts['price'],
             'cheap': self.percepts['price'],
             'low': 0,
-            'min': self.percepts['max_n']
+            'min': self.percepts['max_n'],
+            'time_without_cheap': 0
         }
 
     def act(self):
@@ -99,6 +100,7 @@ class Agent:
         # se tá barato enche o estoque
         if self.percepts['price'] <= self.S['cheap']:
             to_buy = self.percepts['max_n'] - self.percepts['n']
+            self.S['time_without_cheap'] = 0
 
         action = {'to_buy': to_buy}
 
@@ -109,9 +111,15 @@ class Agent:
         # Update belief state
         mean_value = (self.S['average_price'] * self.clock + self.percepts['price']) / (self.clock + 1)
 
-        # cheap = mean_value
-        # if self.clock == 1:
-        #     cheap = mean_value * 0.8
+        cheap = mean_value * 0.8
+        if self.S['time_without_cheap'] == 10:
+            cheap = mean_value * 0.85
+        elif self.S['time_without_cheap'] == 20:
+            cheap = mean_value * 0.90
+        elif self.S['time_without_cheap'] == 30:
+            cheap = mean_value * 0.95
+        elif self.S['time_without_cheap'] >= 40:
+            cheap = mean_value
 
         day = self.percepts['day']
         next_day = day + 1 if day < 6 else -1
@@ -119,12 +127,10 @@ class Agent:
 
         self.S = {
             'average_price': mean_value,
-            # TODO mudar o multiplicador, fica verificando se preço baixo acontece, se não tiver preço baixo por muito tempo aumenta ele até chegar na média
-            # ou o barato pode ser menor que a última compra
-            'cheap': mean_value * 0.8,
-            # 'cheap': self.percepts['price'],
+            'cheap': cheap,
             'low': low,
-            'min': low * 1.5
+            'min': low * 1.5,
+            'time_without_cheap': self.S['time_without_cheap'] + 1
         }
         self.clock += 1
 
@@ -142,15 +148,6 @@ if __name__ == '__main__':
         prices.append(env.price)
         inventory.append(env.n)
 
-    # fig, ax1 = plt.subplots()
-    # ax2 = ax1.twinx()
-    # ax1.plot(prices, 'g-')
-    # ax2.plot(inventory, 'b-')
-
-    # ax1.set_xlabel('Tempo')
-    # ax1.set_ylabel("Preço", color='g')
-    # ax2.set_ylabel("Estoque", color='b')
-
     plt.plot(prices)
     plt.title("Preço")
     plt.show()
@@ -164,11 +161,3 @@ if __name__ == '__main__':
     plt.show()
 
     plt.show()
-
-"""
-    plt.plot(prices, label="Preço")
-    plt.plot(inventory, label="Estoque")
-    plt.plot(ag.spendings, label="Gasto")
-    plt.legend()
- """
-
