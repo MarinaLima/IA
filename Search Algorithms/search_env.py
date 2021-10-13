@@ -2,6 +2,8 @@
 Agente conhece só os vizinhos
 Agente recebe quais posições ele pode visitar baseado no ponto inicial
     0 livre 1 ocupado
+Implementar interface gráfica
+Implementar um ambiente dinâmico - que muda o objetivo
 
 """
 import numpy as np
@@ -32,7 +34,8 @@ class Environment:
         available = self.get_available_positions(self.start)
 
         return [{'available_actions': available,
-                'position': self.agent_position}]
+                'position': self.agent_position,
+                 'goal': self.goal}]
 
     def signal(self, action):
         """
