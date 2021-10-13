@@ -17,15 +17,20 @@ class Environment:
         # Ações possiveis do agente: pode andar pra frente, pra trás, pra cima, para baixo, na diagonal
         self.actions = np.array([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]])
 
-    def initial_percepts(self):
+    def get_available_positions(self, initial_position):
         available = []
         # Passa pro agente apenas as ações possiveis, baseadas no mapa
         for a in self.actions:
-            position = self.start + a
+            position = initial_position + a
             # Verifica se a posição está disponível e se está dentro dos limites do mapa
             if (0 <= position[0] <= self.map.shape[0]) and (0 <= position[1] <= self.map.shape[1]) and \
                     map[position[0]][position[1]] == 0:
                 available.append(position)
+        return available
+
+    def initial_percepts(self):
+        available = self.get_available_positions(self.start)
+
         return [{'available_actions': available,
                 'position': self.agent_position}]
 
@@ -36,14 +41,7 @@ class Environment:
         """
         self.agent_position += action['step']
 
-        available = []
-        # Passa pro agente apenas as ações possiveis, baseadas no mapa
-        for a in self.actions:
-            position = self.agent_position + a
-            # Verifica se a posição está disponível e se está dentro dos limites do mapa
-            if (0 <= position[0] <= self.map.shape[0]) and (0 <= position[1] <= self.map.shape[1]) and \
-                    map[position[0]][position[1]] == 0:
-                available.append(position)
+        available = self.get_available_positions(self.agent_position)
 
         return [{'available_actions': available,
                  'position': self.agent_position}]
