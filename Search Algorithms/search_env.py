@@ -25,7 +25,7 @@ class Environment:
         for a in self.actions:
             position = initial_position + a
             # Verifica se a posição está disponível e se está dentro dos limites do mapa
-            if (0 <= position[0] <= self.map.shape[0]) and (0 <= position[1] <= self.map.shape[1]) and \
+            if (0 <= position[0] < self.map.shape[0]) and (0 <= position[1] < self.map.shape[1]) and \
                     map[position[0]][position[1]] == 0:
                 available.append(position)
         return available
@@ -42,7 +42,7 @@ class Environment:
             Recebe ação e retorna novo conjuntio de percepções
             Agente que decide qual posição ele vai
         """
-        self.agent_position += action['step']
+        self.agent_position = action['step']
 
         available = self.get_available_positions(self.agent_position)
 
@@ -51,7 +51,10 @@ class Environment:
                 'goal': self.goal}
 
 
-class Agent:
+class AgentBFS:
+    """
+        Busca em largura - sempre encontra o caminho com menor número de arestas possíveis
+    """
 
     def __init__(self, env):
         self.belief_state = env.initial_percepts()
@@ -72,7 +75,7 @@ class Agent:
             # Visita o nó
             self.belief_state = self.environment.signal({'step': path[-1]})
             # Verifica se é a posição final
-            if (path[-1] == self.belief_state['goal']).all:
+            if (path[-1] == self.belief_state['goal']).all():
                 return path
             # Visita posição e verifica ações possiveis
             else:
@@ -88,7 +91,7 @@ if __name__ == '__main__':
 
     env = Environment(map, [0, 0], [2, 2])
 
-    ag = Agent(env)
+    ag = AgentBFS(env)
     path = ag.act()
     print(path)
 
