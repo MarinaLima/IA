@@ -33,9 +33,9 @@ class Environment:
     def initial_percepts(self):
         available = self.get_available_positions(self.start)
 
-        return [{'available_actions': available,
+        return {'available_positions': available,
                 'position': self.agent_position,
-                 'goal': self.goal}]
+                'goal': self.goal}
 
     def signal(self, action):
         """
@@ -46,10 +46,49 @@ class Environment:
 
         available = self.get_available_positions(self.agent_position)
 
-        return [{'available_actions': available,
-                 'position': self.agent_position}]
+        return {'available_positions': available,
+                'position': self.agent_position,
+                'goal': self.goal}
+
+
+class Agent:
+
+    def __init__(self, env):
+        self.belief_state = env.initial_percepts()
+        self.environment = env
+
+    def act(self):
+        """
+        Faz a ação - algoritmo de busca
+        """
+        # Começa com uma fronteira com o estado inicial, guarda as posições
+        # Vai ter vºárias posições e caminhos
+        f = [[self.belief_state['position']]]
+
+        # Enquanto a fornteira não estiver vazia
+        while f:
+            # A gente tira um caminho do início da fronteira
+            path = f.pop(0)
+            # Visita o nó
+            self.belief_state = self.environment.signal({'step': path[-1]})
+            # Verifica se é a posição final
+            if (path[-1] == self.belief_state['goal']).all:
+                return path
+            # Visita posição e verifica ações possiveis
+            else:
+                for p in self.belief_state['available_positions']:
+                    # Busca em largura - adiciona no final da fila as posições disponíveis
+                    f.append(path + [p])
 
 
 if __name__ == '__main__':
-    map = [[0, 1],
-           [1, 0]]
+    map = [[0, 0, 1],
+           [1, 0, 1],
+           [1, 0, 0]]
+
+    env = Environment(map, [0, 0], [2, 2])
+
+    ag = Agent(env)
+    path = ag.act()
+    print(path)
+
