@@ -5,6 +5,9 @@ Agente recebe quais posições ele pode visitar baseado no ponto inicial
 Implementar interface gráfica
 Implementar um ambiente dinâmico - que muda o objetivo
 
+Para transformar em busca por profundidade é só adicionar no inicio da pilha, mas precisa implementar algo para não
+agarrar no loop
+
 """
 import numpy as np
 
@@ -84,6 +87,47 @@ class AgentBFS:
                     f.append(path + [p])
 
 
+class AgentDFS:
+    """
+        Busca em profundidade
+    """
+
+    def __init__(self, env):
+        self.belief_state = env.initial_percepts()
+        self.environment = env
+
+    def act(self):
+        """
+        Faz a ação - algoritmo de busca
+        """
+        # Começa com uma fronteira com o estado inicial, guarda as posições
+        # Vai ter várias posições e caminhos
+        f = [[self.belief_state['position']]]
+
+        # Enquanto a fornteira não estiver vazia
+        while f:
+            # A gente tira um caminho do início da fronteira
+            path = f.pop(0)
+            # Visita o nó
+            self.belief_state = self.environment.signal({'step': path[-1]})
+            # Verifica se é a posição final
+            if (path[-1] == self.belief_state['goal']).all():
+                return path
+            # Visita posição e verifica ações possiveis
+            else:
+                for p in self.belief_state['available_positions']:
+                    # Poda de ciclos - verifica se p já está em path
+                    makes_cycle = False
+                    # if all(item in path for item in np.array[p[0], p[1]]):
+                    for pos in path:
+                        if (pos == p).all():
+                            makes_cycle = True
+                            break
+                    if not makes_cycle:
+                        # Busca em profuncidade - adiciona no inicio da pilha
+                        f = [path + [p]] + f
+
+
 if __name__ == '__main__':
     map = [[0, 0, 1],
            [1, 0, 1],
@@ -91,7 +135,7 @@ if __name__ == '__main__':
 
     env = Environment(map, [0, 0], [2, 2])
 
-    ag = AgentBFS(env)
+    ag = AgentDFS(env)
     path = ag.act()
     print(path)
 
