@@ -10,6 +10,8 @@ agarrar no loop
 
 """
 import numpy as np
+from scipy.spatial import distance
+import heapq as heap
 
 
 class Environment:
@@ -146,6 +148,77 @@ class AgentDFS:
                         f = [path + [p]] + f
 
 
+class HeapPath(object):
+    def __init__(self, value, path):
+        self.path = path
+        self.value = value
+
+    def get_path(self):
+        return self.path
+
+    # função de comparação da heap minima
+    def __lt__(self, other):
+        # compara apenas em relação ao valor chave
+        return self.value < other.value
+
+
+class AgentGreedy:
+    """
+        Guloso - busca em profundidade tirando aresta de menor custo com heap mínima baseada no valor da heurística h
+    """
+
+    def __init__(self, env):
+        self.belief_state = env.initial_percepts()
+        self.environment = env
+        # heuristica
+        h = distance.euclidean(env.start, self.belief_state['goal'])
+        heap.heappush(self.belief_state['position'], HeapPath(h, [env.start]))
+
+    def act(self):
+
+
+        # seleciona um caminho da fronteira
+        path = self.remove_from_frontier()
+
+        # visita o caminho e retorna seus vizinhos viaveis
+        viable_neighbors = self.visit_neighbours(path)
+
+        # atualiza a fronteira
+        self.update_frontier(path, viable_neighbors)
+
+        """
+        Faz a ação - algoritmo de busca
+        """
+        # Começa com uma fronteira com o estado inicial, guarda as posições
+        # Vai ter várias posições e caminhos
+        f = [[self.belief_state['position']]]
+
+        # Enquanto a fornteira não estiver vazia
+        while f:
+            # A gente tira um caminho de acordo com o heap
+            path = f.pop(heap.heappop(f).get_path())
+            # Visita o nó
+            self.belief_state = self.environment.signal({'step': path[-1]})
+            # Verifica se é a posição final
+            if (path[-1] == self.belief_state['goal']).all():
+                return path
+            # Visita posição e verifica ações possiveis
+            else:
+                for p in self.belief_state['available_positions']:
+                    # Poda de ciclos - verifica se p já está em path
+                    makes_cycle = False
+                    # if all(item in path for item in np.array[p[0], p[1]]):
+                    for pos in path:
+                        if (pos == p).all():
+                            makes_cycle = True
+                            break
+                    if not makes_cycle:
+                        # Adiciona vizinho no caminho
+                        f = [path + [p]] + f
+                        h = distance.euclidean(p, self.percepts['goal'])
+                        heap.heappush(f, HeapPath(h, f))
+
+
 if __name__ == '__main__':
     room = [[0, 0, 1],
            [1, 0, 1],
@@ -153,7 +226,7 @@ if __name__ == '__main__':
 
     env = Environment([0, 0], [2, 2], room)
 
-    ag = AgentDFS(env)
+    ag = AgentGreedy(env)
     path = ag.act()
     print(path)
 
