@@ -175,17 +175,6 @@ class AgentGreedy:
         heap.heappush(self.belief_state['position'], HeapPath(h, [env.start]))
 
     def act(self):
-
-
-        # seleciona um caminho da fronteira
-        path = self.remove_from_frontier()
-
-        # visita o caminho e retorna seus vizinhos viaveis
-        viable_neighbors = self.visit_neighbours(path)
-
-        # atualiza a fronteira
-        self.update_frontier(path, viable_neighbors)
-
         """
         Faz a ação - algoritmo de busca
         """
