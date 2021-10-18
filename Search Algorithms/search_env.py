@@ -14,10 +14,28 @@ import numpy as np
 
 class Environment:
 
-    def __init__(self, map, start, goal):
-        self.map = np.array(map)
+    def __init__(self, start, goal, room=[], n=10, prob=0.3):
+        """
+
+        :param start: The position where the agents startes
+        :param goal: The position ehre the agent has to go
+        :param room: A matrix representing the free spaces, 0, and obstacles 1.
+        :param n: size of the genrated room is a room is not given
+        :param prob: prob is the probability the a given position will have an obstacle in the generated room
+        """
+        if not room:
+            self.room = np.zeros((n, n))
+
+            for i in range(len(self.room)):
+                for j in range(len(self.room[0])):
+                    self.room[i][j] = 1 if np.random.random() < prob else 0
+        else:
+            self.room = np.array(room)
+
         self.start = np.array(start)
         self.goal = np.array(goal)
+        # Makes sure that the target position does not have an obstacle
+        self.room[self.goal[0]][self.goal[1]] = 0
         self.agent_position = np.array(start)
         # Ações possiveis do agente: pode andar pra frente, pra trás, pra cima, para baixo, na diagonal
         self.actions = np.array([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]])
@@ -28,8 +46,8 @@ class Environment:
         for a in self.actions:
             position = initial_position + a
             # Verifica se a posição está disponível e se está dentro dos limites do mapa
-            if (0 <= position[0] < self.map.shape[0]) and (0 <= position[1] < self.map.shape[1]) and \
-                    map[position[0]][position[1]] == 0:
+            if (0 <= position[0] < self.room.shape[0]) and (0 <= position[1] < self.room.shape[1]) and \
+                    room[position[0]][position[1]] == 0:
                 available.append(position)
         return available
 
@@ -68,7 +86,7 @@ class AgentBFS:
         Faz a ação - algoritmo de busca
         """
         # Começa com uma fronteira com o estado inicial, guarda as posições
-        # Vai ter vºárias posições e caminhos
+        # Vai ter várias posições e caminhos
         f = [[self.belief_state['position']]]
 
         # Enquanto a fornteira não estiver vazia
@@ -129,11 +147,11 @@ class AgentDFS:
 
 
 if __name__ == '__main__':
-    map = [[0, 0, 1],
+    room = [[0, 0, 1],
            [1, 0, 1],
            [1, 0, 0]]
 
-    env = Environment(map, [0, 0], [2, 2])
+    env = Environment([0, 0], [2, 2], room)
 
     ag = AgentDFS(env)
     path = ag.act()
