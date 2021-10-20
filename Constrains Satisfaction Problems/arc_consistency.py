@@ -1,5 +1,9 @@
 import copy as cp
 
+"""
+    Limitação: só aceita restrições com 2 variáveis
+"""
+
 
 def gac(nodes, consts):
     """
