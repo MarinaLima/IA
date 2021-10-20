@@ -54,8 +54,8 @@ if __name__ == "__main__":
              }
 
     # restrições = arcos
-    consts = [{'name': 'C1', 'scope': ['A', 'B'], 'cons': lambda a, b: a < b},
-              {'name': 'C2', 'scope': ['B', 'C'], 'cons': lambda b, c: b < c}]
+    consts = [{'name': 'C1', 'scope': ['A', 'B'], 'cons': lambda A, B: A < B},
+              {'name': 'C2', 'scope': ['B', 'C'], 'cons': lambda B, C: B < C}]
 
     print(consts[0]['cons'](10, 15))
 
