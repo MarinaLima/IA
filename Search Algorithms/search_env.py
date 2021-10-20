@@ -172,7 +172,7 @@ class AgentGreedy:
         self.environment = env
         # heuristica
         h = distance.euclidean(env.start, self.belief_state['goal'])
-        heap.heappush(self.belief_state['position'], HeapPath(h, [env.start]))
+        heap.heappush([self.belief_state['position']], HeapPath(h, [self.belief_state]))
 
     def act(self):
         """
