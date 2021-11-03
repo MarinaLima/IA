@@ -4,6 +4,8 @@
         Função Fitness
     - Mutação
     - Cruzamento
+
+    Algoritmo estocástico - para a mesma entrada pode ter saídas diferentes - precisa rolar várias vezes
 """
 import copy as cp
 import numpy as np
@@ -130,11 +132,11 @@ if __name__ == '__main__':
     print(mutation([1, 1, 1, 1]))
     print(crossover([1, 1, 1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2, 2, 2]))
     """
-    n = 8
-    popsize = 20
+    n = 12
+    popsize = 50
     pop = [[np.random.randint(n) for i in range(n)] for j in range(popsize)]
-    print(pop)
-    best_fitness, best_ind, best_fit_bygen = evolve(pop)
+    # print(pop)
+    best_fitness, best_ind, best_fit_bygen = evolve(pop, ngen=500, prob_mut=0.3)
     print(best_fitness)
     print(best_ind)
     plt.plot(best_fit_bygen)
